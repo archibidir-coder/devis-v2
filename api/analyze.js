@@ -64,7 +64,7 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
 Analyse le document joint et remplis ce JSON avec les vraies valeurs trouvées.`
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
