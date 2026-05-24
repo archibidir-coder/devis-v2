@@ -6,8 +6,8 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) return res.status(500).json({ error: 'Clé API Anthropic manquante dans les variables Vercel.' })
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) return res.status(500).json({ error: 'Clé API Gemini manquante. Ajoutez GEMINI_API_KEY dans Vercel.' })
 
   try {
     const { pdfBase64, mode } = req.body
@@ -32,58 +32,58 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
 {
   "type_document": "${mode}",
   "checks": {
-    "siret": {"present": bool, "valeur": "...", "conforme": bool|null, "alerte_mpr": null, "commentaire": "..."},
-    "date_emission": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
-    "numero_document": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
-    "rcs_rne": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
-    "adresse_siege": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
-    "tva_intra": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
-    "montants": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."}${isDevis ? `,
-    "date_visite": {"present": bool, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
-    "rge": {"present": bool, "valeur": "...", "conforme": bool|null, "alerte_mpr": null, "commentaire": "..."},
-    "dechets": {"present": bool, "valeur": "...", "conforme": bool|null, "alerte_mpr": null, "commentaire": "..."}` : ''},
-    "perf_menuiseries": {"present": bool, "valeur": "...", "conforme": bool|null, "alerte_mpr": null, "commentaire": "..."},
+    "siret": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "date_emission": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "numero_document": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "rcs_rne": {"present": false, "valeur": null, "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "adresse_siege": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "tva_intra": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "montants": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."}${isDevis ? `,
+    "date_visite": {"present": true, "valeur": "...", "conforme": null, "alerte_mpr": null, "commentaire": "..."},
+    "rge": {"present": true, "valeur": "...", "conforme": true, "alerte_mpr": null, "commentaire": "..."},
+    "dechets": {"present": true, "valeur": "...", "conforme": true, "alerte_mpr": null, "commentaire": "..."}` : ''},
+    "perf_menuiseries": {"present": false, "valeur": null, "conforme": null, "alerte_mpr": null, "commentaire": "Non applicable"},
     "perf_isolation": {
-      "present": bool, "conforme": bool|null, "alerte_mpr": "texte si ITI/ITE sinon null", "commentaire": "...",
+      "present": true, "conforme": true, "alerte_mpr": null, "commentaire": "...",
       "details": {
-        "surface_isoler": {"present": bool, "valeur": "...", "commentaire": "..."},
-        "type_isolant": {"present": bool, "valeur": "...", "commentaire": "..."},
-        "epaisseur": {"present": bool, "valeur": "...", "commentaire": "..."},
-        "acermi": {"present": bool, "valeur": "...", "commentaire": "..."}
+        "surface_isoler": {"present": true, "valeur": "...", "commentaire": "..."},
+        "type_isolant": {"present": true, "valeur": "...", "commentaire": "..."},
+        "epaisseur": {"present": true, "valeur": "...", "commentaire": "..."},
+        "acermi": {"present": true, "valeur": "...", "commentaire": "..."}
       }
     },
-    "perf_pac": {"present": bool, "valeur": "...", "conforme": bool|null, "alerte_mpr": "texte si PAC air/air ou hybride sinon null", "commentaire": "..."},
-    "perf_bois": {"present": bool, "valeur": "...", "conforme": bool|null, "alerte_mpr": "texte si chaudière biomasse sinon null", "commentaire": "..."}
+    "perf_pac": {"present": false, "valeur": null, "conforme": null, "alerte_mpr": null, "commentaire": "Non applicable"},
+    "perf_bois": {"present": false, "valeur": null, "conforme": null, "alerte_mpr": null, "commentaire": "Non applicable"}
   },
   "score": 0,
   "total": 0,
-  "verdict": "conforme|incomplet|non conforme",
+  "verdict": "incomplet",
   "remarque_globale": "..."
-}`
+}
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 3000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
-      })
-    })
+Analyse le document joint et remplis ce JSON avec les vraies valeurs trouvées.`
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { inline_data: { mime_type: 'application/pdf', data: pdfBase64 } },
+              { text: prompt }
+            ]
+          }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 3000 }
+        })
+      }
+    )
 
     const data = await response.json()
     if (data.error) return res.status(500).json({ error: data.error.message })
-    const raw = data.content.map(b => b.text || '').join('')
+
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
     const clean = raw.replace(/```json|```/g, '').trim()
     return res.status(200).json(JSON.parse(clean))
   } catch (e) {
