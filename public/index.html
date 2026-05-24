@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Analyse Devis — MaPrimeRénov' 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; color: #111827; min-height: 100vh; }
+    .container { max-width: 700px; margin: 0 auto; padding: 32px 20px 64px; }
+    .header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .logo { width: 44px; height: 44px; background: #1d4ed8; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .header h1 { font-size: 20px; font-weight: 700; color: #111827; }
+    .header p { font-size: 13px; color: #6b7280; margin-top: 2px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab { padding: 8px 20px; border-radius: 8px; border: 1.5px solid #e5e7eb; font-size: 13px; cursor: pointer; background: #fff; color: #6b7280; font-weight: 500; transition: all .15s; }
+    .tab.active { border-color: #1d4ed8; background: #eff6ff; color: #1d4ed8; }
+    .upload-zone { border: 2px dashed #d1d5db; border-radius: 14px; padding: 40px 20px; text-align: center; cursor: pointer; background: #fafafa; transition: all .15s; margin-bottom: 14px; }
+    .upload-zone:hover, .upload-zone.drag { border-color: #1d4ed8; background: #eff6ff; }
+    .upload-zone .icon { font-size: 36px; margin-bottom: 10px; }
+    .upload-zone .main { font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .upload-zone .sub { font-size: 12px; color: #9ca3af; }
+    .file-info { display: flex; align-items: center; gap: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
+    .file-info .fname { flex: 1; font-size: 13px; font-weight: 600; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-info .fsize { font-size: 11px; color: #6b7280; }
+    .btn-clear { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; padding: 2px 6px; }
+    .btn-analyze { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; background: #1d4ed8; color: #fff; transition: all .15s; margin-bottom: 24px; }
+    .btn-analyze:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+    .btn-analyze:not(:disabled):hover { background: #1e40af; }
+    .error { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #dc2626; margin-bottom: 16px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .card .lbl { font-size: 11px; color: #6b7280; margin-bottom: 5px; }
+    .card .val { font-size: 19px; font-weight: 700; color: #111827; }
+    .summary { border-radius: 10px; padding: 11px 15px; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .summary.ok { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .summary.warn { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .summary.ko { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .section-title { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 8px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+    .checks { display: flex; flex-direction: column; gap: 7px; }
+    .check { display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; }
+    .check.sub { margin-left: 24px; border-left: 3px solid #e5e7eb; }
+    .ci { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .ci.ok { background: #f0fdf4; color: #16a34a; }
+    .ci.ko { background: #fef2f2; color: #dc2626; }
+    .ci.warn { background: #fffbeb; color: #d97706; }
+    .cinfo { flex: 1; min-width: 0; }
+    .cname { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 2px; }
+    .cname.sm { font-size: 12px; }
+    .badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; font-weight: 500; }
+    .badge.ok { background: #f0fdf4; color: #16a34a; }
+    .badge.ko { background: #fef2f2; color: #dc2626; }
+    .badge.warn { background: #fffbeb; color: #d97706; }
+    .cdetail { font-size: 12px; color: #6b7280; line-height: 1.5; }
+    .cfound { font-size: 11px; color: #16a34a; margin-top: 3px; font-family: monospace; }
+    .calert { font-size: 11px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 5px 9px; margin-top: 5px; }
+    .btn-dl { width: 100%; padding: 11px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; color: #374151; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 20px; }
+    .btn-dl:hover { background: #f9fafb; }
+    footer { text-align: center; font-size: 11px; color: #d1d5db; margin-top: 48px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">📋</div>
+    <div>
+      <h1>Agent Analyse Devis / Facture</h1>
+      <p>Vérification automatique — MaPrimeRénov' 2026</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('devis',this)">📄 Devis</button>
+    <button class="tab" onclick="setMode('facture',this)">🧾 Facture</button>
+  </div>
+
+  <div id="drop-zone" class="upload-zone" onclick="document.getElementById('file-input').click()">
+    <div class="icon">📂</div>
+    <div class="main">Cliquez ou déposez votre PDF ici</div>
+    <div class="sub">PDF uniquement — max 10 Mo</div>
+  </div>
+  <input type="file" id="file-input" accept="application/pdf" style="display:none" onchange="onFile(event)" />
+
+  <div id="file-info" class="file-info" style="display:none">
+    <span style="font-size:20px">📄</span>
+    <span class="fname" id="fname"></span>
+    <span class="fsize" id="fsize"></span>
+    <button class="btn-clear" onclick="clearFile()">✕</button>
+  </div>
+
+  <button id="btn-analyze" class="btn-analyze" onclick="analyze()" disabled>🔍 Analyser le devis</button>
+
+  <div id="error" class="error" style="display:none"></div>
+  <div id="results" style="display:none"></div>
+
+  <footer>Critères MaPrimeRénov' / ANAH — Mis à jour 2026</footer>
+</div>
+
+<script>
+let pdfBase64 = null, mode = 'devis';
+
+const LABELS = {
+  siret:'SIRET / SIREN', date_emission:"Date d'émission", numero_document:'Numéro du document',
+  rcs_rne:'Numéro RCS / RNE', adresse_siege:'Adresse du siège social', tva_intra:'TVA intracommunautaire',
+  montants:'Montants HT / TTC / TVA', date_visite:'Date de visite technique', rge:'Qualification RGE',
+  dechets:'Gestion des déchets', perf_menuiseries:'Menuiseries', perf_isolation:'Isolation thermique',
+  perf_pac:'Pompe à chaleur / CET', perf_bois:'Chauffage bois'
+};
+const ISO_LABELS = { surface_isoler:'Surface à isoler', type_isolant:"Type d'isolant", epaisseur:'Épaisseur', acermi:'Certificat ACERMI' };
+const ADMIN = ['siret','date_emission','numero_document','rcs_rne','adresse_siege','tva_intra','montants','date_visite','rge','dechets'];
+const PERF = ['perf_menuiseries','perf_isolation','perf_pac','perf_bois'];
+
+function setMode(m, el) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('btn-analyze').textContent = `🔍 Analyser le ${m}`;
+  document.getElementById('results').style.display = 'none';
+}
+
+function onFile(e) { const f = e.target.files[0]; if (f) loadFile(f); }
+function loadFile(f) {
+  if (f.type !== 'application/pdf') { alert('PDF uniquement.'); return; }
+  if (f.size > 10*1024*1024) { alert('Max 10 Mo.'); return; }
+  new FileReader().onload = e => {
+    pdfBase64 = e.target.result.split(',')[1];
+    document.getElementById('fname').textContent = f.name;
+    document.getElementById('fsize').textContent = (f.size/1024).toFixed(0) + ' Ko';
+    document.getElementById('file-info').style.display = 'flex';
+    document.getElementById('drop-zone').style.display = 'none';
+    document.getElementById('btn-analyze').disabled = false;
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+  };
+  const r = new FileReader(); r.onload = e => {
+    pdfBase64 = e.target.result.split(',')[1];
+    document.getElementById('fname').textContent = f.name;
+    document.getElementById('fsize').textContent = (f.size/1024).toFixed(0)+' Ko';
+    document.getElementById('file-info').style.display = 'flex';
+    document.getElementById('drop-zone').style.display = 'none';
+    document.getElementById('btn-analyze').disabled = false;
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+  }; r.readAsDataURL(f);
+}
+function clearFile() {
+  pdfBase64 = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('file-info').style.display = 'none';
+  document.getElementById('drop-zone').style.display = 'block';
+  document.getElementById('btn-analyze').disabled = true;
+  document.getElementById('results').style.display = 'none';
+}
+
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
+
+async function analyze() {
+  if (!pdfBase64) return;
+  const btn = document.getElementById('btn-analyze');
+  btn.disabled = true; btn.textContent = '⏳ Analyse en cours…';
+  document.getElementById('error').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  try {
+    const resp = await fetch('/api/analyze', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pdfBase64, mode })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    render(data);
+  } catch(e) {
+    const el = document.getElementById('error');
+    el.style.display = 'block'; el.textContent = '❌ ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = `🔍 Analyser le ${mode}`;
+}
+
+function iconType(c) { if (!c.present) return 'ko'; if (c.conforme === false) return 'warn'; return 'ok'; }
+function badgeInfo(c) {
+  if (!c.present) return ['ko','Absent'];
+  if (c.conforme === false) return ['warn','Non conforme'];
+  if (c.conforme === true) return ['ok','Conforme'];
+  return ['ok','Présent'];
+}
+function checkHTML(label, c, sub=false) {
+  const it = iconType(c), [bt, bl] = badgeInfo(c);
+  const sym = it==='ok'?'✓':it==='warn'?'⚠':'✕';
+  return `<div class="check${sub?' sub':''}">
+    <div class="ci ${it}">${sym}</div>
+    <div class="cinfo">
+      <div class="cname${sub?' sm':''}">${label}<span class="badge ${bt}">${bl}</span></div>
+      ${c.commentaire?`<div class="cdetail">${c.commentaire}</div>`:''}
+      ${c.alerte_mpr?`<div class="calert">⚠ ${c.alerte_mpr}</div>`:''}
+      ${c.present&&c.valeur&&c.valeur!=='null'&&c.valeur!=='Non applicable'?`<div class="cfound">${c.valeur}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function render(r) {
+  const vc = r.verdict==='conforme'?'ok':r.verdict==='incomplet'?'warn':'ko';
+  const vv = (r.verdict||'').charAt(0).toUpperCase()+(r.verdict||'').slice(1);
+  let html = `
+    <div class="cards">
+      <div class="card"><div class="lbl">Score</div><div class="val">${r.score} / ${r.total}</div></div>
+      <div class="card"><div class="lbl">Type</div><div class="val" style="font-size:15px">${(r.type_document||'').charAt(0).toUpperCase()+(r.type_document||'').slice(1)}</div></div>
+      <div class="card"><div class="lbl">Verdict</div><div class="val" style="font-size:15px;color:${vc==='ok'?'#16a34a':vc==='warn'?'#d97706':'#dc2626'}">${vv}</div></div>
+    </div>
+    <div class="summary ${vc}">${r.remarque_globale||''}</div>
+    <div class="section-title">Éléments administratifs</div>
+    <div class="checks">`;
+  ADMIN.filter(k => r.checks?.[k]).forEach(k => { html += checkHTML(LABELS[k]||k, r.checks[k]); });
+  html += `</div><div class="section-title">Critères de performance</div><div class="checks">`;
+  PERF.filter(k => r.checks?.[k]).forEach(k => {
+    const c = r.checks[k];
+    html += checkHTML(LABELS[k]||k, c);
+    if (k==='perf_isolation' && c.present && c.details) {
+      Object.entries(c.details).forEach(([sk,sv]) => { html += checkHTML(ISO_LABELS[sk]||sk, sv, true); });
+    }
+  });
+  html += `</div>
+    <button class="btn-dl" onclick="dlJSON()">⬇ Télécharger le rapport JSON</button>`;
+  const el = document.getElementById('results');
+  el.innerHTML = html; el.style.display = 'block';
+  window._lastResult = r;
+}
+
+function dlJSON() {
+  if (!window._lastResult) return;
+  const blob = new Blob([JSON.stringify(window._lastResult, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `analyse_${window._lastResult.type_document}_${Date.now()}.json`;
+  a.click();
+}
+</script>
+</body>
+</html>
