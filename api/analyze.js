@@ -15,19 +15,51 @@ module.exports = async function handler(req, res) {
 
     const isDevis = mode === 'devis'
 
-    const prompt = `Tu es un expert en analyse de ${mode}s de travaux de rénovation énergétique en France, spécialiste MaPrimeRénov 2026.
+    const prompt = `Tu es un expert en analyse de ${mode}s de rénovation énergétique France, spécialiste MaPrimeRénov 2026.
 
-Analyse le document PDF joint et retourne UNIQUEMENT un objet JSON valide, sans aucun texte avant ou après, sans markdown, sans backticks.
+Analyse ce PDF et réponds avec un JSON strictement valide.
 
-Règles MPR 2026 : Murs ITI/ITE non éligibles par geste. Chaudières biomasse non éligibles. PAC air/air et hybrides exclues.
+RÈGLES MPR 2026 : ITI/ITE non éligibles par geste. Chaudières biomasse non éligibles. PAC air/air et hybrides exclues.
+MENUISERIES : Fenêtres Uw<=1.3 Sw>=0.3 OU Uw<=1.7 Sw>=0.36. Velux Uw<=1.5 Sw>=0.36. Doubles fenêtres Uw<=1.8 Sw>=0.36. Porte Ud<=1.7. Volets R>0.22.
+ISOLATION : Combles R>=7. Rampants R>=6. Terrasse R>=6.5. Plancher R>=3. ITI R>=3.7. ITE R>=4.4.
+PAC : BT ETAS>=126. MT ETAS>=111. CET COP>=3.
+BOIS : Flamme Verte 7 etoiles rendement>=87 poeles ETAS>=111 chaudieres ETAS>=126.
 
-Seuils menuiseries : Fenêtres Uw<=1.3+Sw>=0.3 OU Uw<=1.7+Sw>=0.36. Velux Uw<=1.5+Sw>=0.36. Doubles fenêtres Uw<=1.8+Sw>=0.36. Porte Ud<=1.7. Volets R>0.22.
-Seuils isolation : Combles R>=7. Rampants R>=6. Terrasse R>=6.5. Plancher R>=3. ITI R>=3.7. ITE R>=4.4.
-Seuils PAC : BT ETAS>=126%. MT ETAS>=111%. CET COP>=3.
-Seuils bois : Flamme Verte 7 etoiles, rendement>=87%, poeles ETAS>=111%, chaudieres ETAS>=126%.
+IMPORTANT : Dans tes valeurs texte, utilise uniquement des caractères simples. Evite les guillemets, apostrophes, accents problematiques dans les valeurs JSON. Remplace les apostrophes par des espaces.
 
-Retourne ce JSON en remplacant les valeurs par ce que tu trouves dans le document :
-{"type_document":"${mode}","checks":{"siret":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"date_emission":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"numero_document":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"rcs_rne":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"adresse_siege":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"tva_intra":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"montants":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""}${isDevis ? ',"date_visite":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"rge":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"dechets":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""}' : ''},"perf_menuiseries":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"perf_isolation":{"present":false,"conforme":null,"alerte_mpr":null,"commentaire":"","details":{"surface_isoler":{"present":false,"valeur":null,"commentaire":""},"type_isolant":{"present":false,"valeur":null,"commentaire":""},"epaisseur":{"present":false,"valeur":null,"commentaire":""},"acermi":{"present":false,"valeur":null,"commentaire":""}}},"perf_pac":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""},"perf_bois":{"present":false,"valeur":null,"conforme":null,"alerte_mpr":null,"commentaire":""}},"score":0,"total":0,"verdict":"incomplet","remarque_globale":""}`
+Retourne ce JSON complété avec les vraies valeurs du document :
+
+{
+  "type_document": "${mode}",
+  "checks": {
+    "siret": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "date_emission": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "numero_document": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "rcs_rne": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "adresse_siege": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "tva_intra": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "montants": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" }${isDevis ? `,
+    "date_visite": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "rge": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "dechets": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" }` : ''},
+    "perf_menuiseries": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "perf_isolation": {
+      "present": false, "conforme": null, "alerte_mpr": "", "commentaire": "",
+      "details": {
+        "surface_isoler": { "present": false, "valeur": "", "commentaire": "" },
+        "type_isolant": { "present": false, "valeur": "", "commentaire": "" },
+        "epaisseur": { "present": false, "valeur": "", "commentaire": "" },
+        "acermi": { "present": false, "valeur": "", "commentaire": "" }
+      }
+    },
+    "perf_pac": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" },
+    "perf_bois": { "present": false, "valeur": "", "conforme": null, "alerte_mpr": "", "commentaire": "" }
+  },
+  "score": 0,
+  "total": 0,
+  "verdict": "incomplet",
+  "remarque_globale": ""
+}`
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
@@ -52,13 +84,25 @@ Retourne ce JSON en remplacant les valeurs par ce que tu trouves dans le documen
     if (data.error) return res.status(500).json({ error: data.error.message })
 
     let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-    // Nettoyer le JSON
     raw = raw.replace(/```json/g, '').replace(/```/g, '').trim()
-    // Extraire le JSON si entouré de texte
-    const match = raw.match(/\{[\s\S]*\}/)
-    if (!match) return res.status(500).json({ error: 'Réponse invalide du modèle. Réessayez.' })
 
-    return res.status(200).json(JSON.parse(match[0]))
+    // Nettoyer les caractères problématiques
+    raw = raw.replace(/[\u0000-\u001F\u007F]/g, ' ')
+
+    const match = raw.match(/\{[\s\S]*\}/)
+    if (!match) return res.status(500).json({ error: 'Reponse invalide. Reessayez.' })
+
+    try {
+      return res.status(200).json(JSON.parse(match[0]))
+    } catch(parseErr) {
+      // Tentative de réparation JSON basique
+      let fixed = match[0]
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*]/g, ']')
+        .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3')
+      return res.status(200).json(JSON.parse(fixed))
+    }
+
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }
