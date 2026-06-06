@@ -315,8 +315,57 @@ function renderResult(i,fname,r){
   PERF.filter(k=>r.checks?.[k]).forEach(k=>{
     const c=r.checks[k];
     html+=checkHTML(LABELS[k]||k,c);
+
+    // Sous-details isolation
     if(k==='perf_isolation'&&c.present&&c.details){
       Object.entries(c.details).forEach(([sk,sv])=>{html+=checkHTML(ISO_LABELS[sk]||sk,sv,true)});
+    }
+
+    // Sous-details PAC
+    if(k==='perf_pac'&&c.present&&c.details){
+      const d=c.details;
+      if(d.type_pac)html+=`<div class="check sub"><div class="ci ok">i</div><div class="cinfo"><div class="cname sm">Type PAC</div><div class="cfound">${d.type_pac}</div></div></div>`;
+      const pacFields=[
+        {key:'etas',label:'ETAS (efficacite energetique saisonniere)'},
+        {key:'scop',label:'SCOP (coefficient performance saisonnier)'},
+        {key:'cop',label:'COP (coefficient performance)'},
+        {key:'taux_couverture',label:'Taux de couverture PAC'}
+      ];
+      pacFields.forEach(f=>{
+        if(d[f.key]){
+          const sv=d[f.key];
+          html+=checkHTML(f.label,{
+            present:sv.present,
+            valeur:sv.valeur||'',
+            conforme:sv.conforme!==undefined?sv.conforme:null,
+            alerte_mpr:'',
+            commentaire:sv.commentaire||(!sv.present?'ABSENT - obligatoire pour eligibilite MPR':'')
+          },true);
+        }
+      });
+    }
+
+    // Sous-details chauffage bois
+    if(k==='perf_bois'&&c.present&&c.details){
+      const d=c.details;
+      if(d.type_equipement)html+=`<div class="check sub"><div class="ci ok">i</div><div class="cinfo"><div class="cname sm">Type equipement</div><div class="cfound">${d.type_equipement}</div></div></div>`;
+      const boisFields=[
+        {key:'flamme_verte',label:'Label Flamme Verte 7 etoiles'},
+        {key:'rendement',label:'Rendement (>= 87%)'},
+        {key:'etas',label:'ETAS (>= 111% poeles / >= 126% chaudieres)'}
+      ];
+      boisFields.forEach(f=>{
+        if(d[f.key]){
+          const sv=d[f.key];
+          html+=checkHTML(f.label,{
+            present:sv.present,
+            valeur:sv.valeur||'',
+            conforme:sv.conforme!==undefined?sv.conforme:null,
+            alerte_mpr:'',
+            commentaire:sv.commentaire||(!sv.present?'ABSENT - obligatoire pour eligibilite MPR':'')
+          },true);
+        }
+      });
     }
   });
   html+=`</div>`;
@@ -407,10 +456,36 @@ async function checkRGE(i,siretRaw,analysisData){
       <div class="rc-info">${data.adresse||''}</div>
       <div class="rc-info" style="margin-top:2px">SIRET : ${siret}</div>`;
 
+      // Vérifier validité RGE depuis le devis analysé
+      const rgeCheck = analysisData.checks?.rge;
+      const rgeValeur = rgeCheck?.valeur || '';
+      const rgeCommentaire = rgeCheck?.commentaire || '';
+
+      // Extraire date expiration du commentaire RGE
+      const dateMatch = rgeValeur.match(/(\d{2}[\/\-]\d{2}[\/\-]\d{4})/);
+      if(dateMatch){
+        const parts = dateMatch[1].split(/[\/\-]/);
+        const dateExp = new Date(parts[2], parts[1]-1, parts[0]);
+        const today = new Date();
+        const expired = dateExp < today;
+        const daysLeft = Math.ceil((dateExp - today) / (1000*60*60*24));
+        if(expired){
+          html+=`<div class="calert" style="margin:6px 0">❌ RGE EXPIRE le ${dateMatch[1]} — Non eligible MPR. Demandez un nouveau certificat RGE valide.</div>`;
+        } else if(daysLeft < 90){
+          html+=`<div class="calert" style="margin:6px 0">⚠ RGE expire dans ${daysLeft} jours (${dateMatch[1]}) — A renouveler rapidement.</div>`;
+        } else {
+          html+=`<div style="font-size:10px;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:4px 8px;margin:6px 0">✅ RGE valide jusqu au ${dateMatch[1]} (${daysLeft} jours restants)</div>`;
+        }
+      }
+
+      if(rgeValeur){
+        html+=`<div class="rge-cert-detail" style="margin:4px 0">📋 ${rgeValeur}</div>`;
+      }
+
       // Labels RGE trouvés via API
       const certs=data.certifications_api||[];
       if(certs.length>0){
-        html+=`<div style="font-size:10px;font-weight:600;color:#16a34a;margin:8px 0 4px">✅ Certifications RGE détectées (${certs.length})</div>`;
+        html+=`<div style="font-size:10px;font-weight:600;color:#16a34a;margin:8px 0 4px">✅ Certifications RGE detectees via API (${certs.length})</div>`;
         certs.forEach(c=>{
           html+=`<div class="rge-cert">
             <div class="rge-dot dot-ok"></div>
@@ -420,10 +495,11 @@ async function checkRGE(i,siretRaw,analysisData){
           </div>`;
         });
       } else {
-        html+=`<div class="calert" style="margin:6px 0">⚠ Aucune certification RGE détectée automatiquement — vérifiez via les liens ci-dessous</div>`;
+        html+=`<div class="calert" style="margin:6px 0">⚠ Verification automatique limitee — confirmez via les liens ci-dessous</div>`;
       }
     } else {
-      html+=`<div style="font-size:12px;color:#6b7280;margin-bottom:6px">${data.message||'Entreprise non trouvée'}</div>`;
+      html+=`<div style="font-size:12px;color:#dc2626;font-weight:600;margin-bottom:4px">❌ Entreprise non trouvee dans l annuaire</div>`;
+      html+=`<div style="font-size:12px;color:#6b7280;margin-bottom:6px">${data.message||''}</div>`;
     }
 
     // Liens de vérification manuelle — toujours affichés
