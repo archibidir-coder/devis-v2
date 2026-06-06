@@ -38,8 +38,23 @@ Isolation - conforme=true si R respecte le seuil:
 - Combles perdus R>=7. Rampants R>=6. Terrasse R>=6.5. Plancher bas R>=3
 - Murs ITI R>=3.7 (alerte non eligible MPR par geste). Murs ITE R>=4.4 (alerte non eligible MPR par geste)
 
-PAC: BT ETAS>=126. MT ETAS>=111. CET COP>=3. PAC air/air et hybrides exclues.
-Bois: Flamme Verte 7 etoiles, rendement>=87, poeles ETAS>=111, chaudieres ETAS>=126 non eligibles.
+PAC et CET - verifier OBLIGATOIREMENT chaque valeur ligne par ligne:
+- PAC air/eau basse temperature (35C): ETAS>=126 ET SCOP>=3.9. Si ETAS absent: conforme=null + commentaire ETAS manquant obligatoire MPR. Si SCOP absent: signaler SCOP manquant.
+- PAC air/eau moyenne temperature (55C): ETAS>=111 ET SCOP>=3.5. Memes regles si absent.
+- PAC geothermique eau/eau: ETAS>=126. Signaler si absent.
+- CET chauffe-eau thermodynamique: COP>=3 selon EN 16147. Si COP absent: conforme=null + commentaire COP manquant obligatoire MPR.
+- PAC air/air: EXCLUE MPR 2026 - alerte_mpr obligatoire.
+- PAC hybride PAC+chaudiere gaz: EXCLUE MPR 2026 - alerte_mpr obligatoire.
+- Taux couverture PAC si appoint present: >=70%. Signaler si absent.
+- ETAS doit etre mentionne sur le devis/facture - si absent signaler comme manquant obligatoire.
+
+Chauffage bois - verifier OBLIGATOIREMENT chaque valeur:
+- Poeles a buches et inserts: label Flamme Verte 7 etoiles OBLIGATOIRE. Rendement>=87%. ETAS>=111%. Si une valeur absente: conforme=null + commentaire valeur manquante obligatoire MPR.
+- Poeles a granules: label Flamme Verte 7 etoiles OBLIGATOIRE. Rendement>=87%. ETAS>=111%. Memes regles.
+- Chaudieres biomasse: rendement>=87%, ETAS>=126% - NON ELIGIBLES MPR par geste 2026 - alerte_mpr obligatoire.
+- Si label Flamme Verte absent: conforme=false + commentaire label manquant obligatoire.
+- Si rendement absent: conforme=null + commentaire rendement manquant obligatoire MPR.
+- Si ETAS absent: conforme=null + commentaire ETAS manquant obligatoire MPR.
 
 === TRAVAUX INDUITS - SOURCE GUIDE ANAH JUILLET 2025 ===
 
@@ -94,7 +109,7 @@ Lis chaque ligne du devis et identifie les postes qui correspondent a ces catego
 - Installation materiels controle suivi consommations eau electricite (compteurs individuels)
 
 Retourne ce JSON avec les vraies valeurs du document:
-{"type_document":"${mode}","checks":{"siret":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"date_emission":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"numero_document":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rcs_rne":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"adresse_siege":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"tva_intra":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"montants":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}${isDevis ? ',"date_visite":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rge":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"dechets":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}' : ''},"perf_menuiseries":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"perf_isolation":{"present":false,"conforme":null,"alerte_mpr":"","commentaire":"","details":{"surface_isoler":{"present":false,"valeur":"","commentaire":""},"type_isolant":{"present":false,"valeur":"","commentaire":""},"epaisseur":{"present":false,"valeur":"","commentaire":""},"acermi":{"present":false,"valeur":"","commentaire":""}}},"perf_pac":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"perf_bois":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}},"travaux_induits":{"eligibles":[{"designation":"","montant_ht":0,"commentaire":""}],"exclus":[{"designation":"","montant_ht":0,"raison_exclusion":"","commentaire":""}],"total_induits_eligibles_ht":0,"total_exclus_ht":0,"montant_a_deduire_ht":0,"montant_corrige_ht":0,"commentaire_global":""},"score":0,"total":0,"verdict":"incomplet","remarque_globale":""}`
+{"type_document":"${mode}","checks":{"siret":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"date_emission":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"numero_document":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rcs_rne":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"adresse_siege":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"tva_intra":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"montants":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}${isDevis ? ',"date_visite":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rge":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"dechets":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}' : ''},"perf_menuiseries":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"perf_isolation":{"present":false,"conforme":null,"alerte_mpr":"","commentaire":"","details":{"surface_isoler":{"present":false,"valeur":"","commentaire":""},"type_isolant":{"present":false,"valeur":"","commentaire":""},"epaisseur":{"present":false,"valeur":"","commentaire":""},"acermi":{"present":false,"valeur":"","commentaire":""}}},"perf_pac":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"type_pac":"","etas":{"present":false,"valeur":"","conforme":null,"commentaire":""},"scop":{"present":false,"valeur":"","conforme":null,"commentaire":""},"cop":{"present":false,"valeur":"","conforme":null,"commentaire":""},"taux_couverture":{"present":false,"valeur":"","commentaire":""}}},"perf_bois":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"type_equipement":"","flamme_verte":{"present":false,"valeur":"","conforme":null,"commentaire":""},"rendement":{"present":false,"valeur":"","conforme":null,"commentaire":""},"etas":{"present":false,"valeur":"","conforme":null,"commentaire":""}}}},"travaux_induits":{"eligibles":[{"designation":"","montant_ht":0,"commentaire":""}],"exclus":[{"designation":"","montant_ht":0,"raison_exclusion":"","commentaire":""}],"total_induits_eligibles_ht":0,"total_exclus_ht":0,"montant_a_deduire_ht":0,"montant_corrige_ht":0,"commentaire_global":""},"score":0,"total":0,"verdict":"incomplet","remarque_globale":""}`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
