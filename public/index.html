@@ -85,6 +85,22 @@
     .rge-cert-expire{font-size:10px;color:#dc2626}
     .rge-not-found{font-size:12px;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px}
     .rge-link{font-size:11px;color:#1d4ed8;margin-top:6px;display:block}
+    .ti-section{margin-top:14px;padding-top:12px;border-top:1px solid #f3f4f6}
+    .ti-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+    .ti-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px}
+    .ti-table th{background:#f3f4f6;padding:6px 8px;text-align:left;font-weight:600;color:#374151;font-size:10px}
+    .ti-table td{padding:6px 8px;border-bottom:1px solid #f9fafb;color:#374151;vertical-align:top}
+    .ti-table tr:last-child td{border-bottom:none}
+    .ti-elig td{background:#f0fdf4}
+    .ti-excl td{background:#fef2f2}
+    .ti-montant{font-weight:600;text-align:right;white-space:nowrap}
+    .ti-summary{border-radius:8px;padding:10px 12px;margin-top:8px;font-size:12px}
+    .ti-summary-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a}
+    .ti-summary-warn{background:#fffbeb;border:1px solid #fde68a;color:#d97706}
+    .ti-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
+    .ti-row span:first-child{color:#6b7280}
+    .ti-row span:last-child{font-weight:600}
+    .ti-deduire{color:#dc2626;font-weight:700}
     .error{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px;font-size:12px;color:#dc2626;margin-bottom:12px}
     footer{text-align:center;font-size:10px;color:#d1d5db;margin-top:40px}
   </style>
@@ -311,6 +327,58 @@ function renderResult(i,fname,r){
     <div class="rge-loading" id="rge-content-${i}">⏳ Vérification en cours…</div>
   </div>`;
 
+  // Travaux induits
+  const ti = r.travaux_induits
+  if(ti){
+    const hasElig = ti.eligibles && ti.eligibles.length > 0 && ti.eligibles[0].designation
+    const hasExcl = ti.exclus && ti.exclus.length > 0 && ti.exclus[0].designation
+
+    html += `<div class="ti-section">`
+    html += `<div class="ti-title" style="color:#1d4ed8">📋 Travaux induits — Analyse ligne par ligne (Guide ANAH Juillet 2025)</div>`
+
+    if(hasElig){
+      html += `<div class="ti-title" style="color:#16a34a;margin-top:8px">✅ Travaux induits eligibles (${ti.eligibles.length})</div>`
+      html += `<table class="ti-table"><tr><th>Designation</th><th>Montant HT</th><th>Commentaire</th></tr>`
+      ti.eligibles.forEach(t => {
+        html += `<tr class="ti-elig">
+          <td>${t.designation||''}</td>
+          <td class="ti-montant">${t.montant_ht>0?t.montant_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€':'-'}</td>
+          <td>${t.commentaire||''}</td>
+        </tr>`
+      })
+      html += `</table>`
+    }
+
+    if(hasExcl){
+      html += `<div class="ti-title" style="color:#dc2626;margin-top:10px">❌ Travaux induits exclus — A deduire du montant (${ti.exclus.length})</div>`
+      html += `<table class="ti-table"><tr><th>Designation</th><th>Montant HT</th><th>Raison exclusion</th></tr>`
+      ti.exclus.forEach(t => {
+        html += `<tr class="ti-excl">
+          <td>${t.designation||''}</td>
+          <td class="ti-montant ti-deduire">${t.montant_ht>0?'-'+t.montant_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€':'-'}</td>
+          <td>${t.raison_exclusion||t.commentaire||''}</td>
+        </tr>`
+      })
+      html += `</table>`
+    }
+
+    if(ti.montant_corrige_ht>0 || ti.montant_a_deduire_ht>0){
+      const hasDeduction = ti.montant_a_deduire_ht > 0
+      html += `<div class="ti-summary ${hasDeduction?'ti-summary-warn':'ti-summary-ok'}">
+        ${ti.montant_a_deduire_ht>0?`<div class="ti-row"><span>Montant total HT du devis</span><span>${(ti.montant_corrige_ht+ti.montant_a_deduire_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})} €</span></div>
+        <div class="ti-row"><span>Travaux induits exclus a deduire</span><span class="ti-deduire">- ${ti.montant_a_deduire_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})} €</span></div>
+        <div class="ti-row" style="border-top:1px solid #fde68a;padding-top:6px;margin-top:4px"><span style="font-weight:600">Montant HT corrige eligble MPR</span><span style="font-weight:700;font-size:13px">${ti.montant_corrige_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})} €</span></div>`:''}
+        ${ti.commentaire_global?`<div style="margin-top:6px;font-size:10px;color:#6b7280">${ti.commentaire_global}</div>`:''}
+      </div>`
+    }
+
+    if(!hasElig && !hasExcl){
+      html += `<div style="font-size:12px;color:#6b7280;padding:8px 0">Aucun travail induit identifie dans ce devis.</div>`
+    }
+
+    html += `</div>`
+  }
+
   const body=document.getElementById(`body-${i}`);
   body.innerHTML=html;
   body.classList.add('open');
@@ -325,86 +393,70 @@ async function checkRGE(i,siretRaw,analysisData){
   try{
     const resp=await fetch(`/api/rge?siret=${siret}`);
     const data=await resp.json();
-
-    if(!data.found){
-      rgeEl.innerHTML=`<div class="rge-not-found">
-        ❌ Entreprise non trouvée dans l'annuaire RGE ADEME pour le SIRET <strong>${siret}</strong>.<br>
-        Cela peut signifier que l'entreprise n'est pas certifiée RGE ou que le SIRET est incorrect.
-        <a class="rge-link" href="https://france-renov.gouv.fr/annuaires-professionnels/artisan-rge-architecte#/tab" target="_blank">🔗 Vérifier manuellement sur France Rénov'</a>
-      </div>`;
-      return;
-    }
-
-    // Déterminer le domaine de travaux du devis
+    const liens=data.liens||{};
     const checks=analysisData.checks||{};
     const hasIso=checks.perf_isolation?.present;
     const hasMenui=checks.perf_menuiseries?.present;
     const hasPac=checks.perf_pac?.present;
     const hasBois=checks.perf_bois?.present;
 
-    const domainesRecherches=[];
-    if(hasIso)domainesRecherches.push('isolation');
-    if(hasMenui)domainesRecherches.push('menuiserie','fenêtre','fermeture');
-    if(hasPac)domainesRecherches.push('chauffage','pompe à chaleur','pac');
-    if(hasBois)domainesRecherches.push('chauffage','bois','biomasse');
+    let html=`<div class="rge-card">`;
 
-    const certsValides=data.certifications.filter(c=>c.valide);
-    const certsExpires=data.certifications.filter(c=>!c.valide);
+    if(data.found){
+      html+=`<div class="rc-name">🏢 ${data.nom_entreprise}</div>
+      <div class="rc-info">${data.adresse||''}</div>
+      <div class="rc-info" style="margin-top:2px">SIRET : ${siret}</div>`;
 
-    // Vérifier si les domaines du devis sont couverts
-    const alertesDomaines=[];
-    if(hasIso&&!certsValides.some(c=>(c.domaine||'').toLowerCase().includes('isol'))){
-      alertesDomaines.push('Isolation : aucun certificat RGE valide pour ce domaine');
-    }
-    if(hasMenui&&!certsValides.some(c=>(c.domaine||'').toLowerCase().includes('menuiser')||(c.domaine||'').toLowerCase().includes('fermeture'))){
-      alertesDomaines.push('Menuiseries : aucun certificat RGE valide pour ce domaine');
-    }
-    if(hasPac&&!certsValides.some(c=>(c.domaine||'').toLowerCase().includes('chauffage')||(c.domaine||'').toLowerCase().includes('pac'))){
-      alertesDomaines.push('PAC/Chauffage : aucun certificat RGE valide pour ce domaine');
-    }
-
-    let html=`<div class="rge-card">
-      <div class="rc-name">🏢 ${data.nom_entreprise}</div>
-      <div class="rc-info">SIRET : ${siret} · ${data.nb_valides}/${data.nb_certifications} certification(s) valide(s)</div>`;
-
-    if(alertesDomaines.length>0){
-      html+=alertesDomaines.map(a=>`<div class="calert" style="margin-bottom:4px">⚠ ${a}</div>`).join('');
+      // Labels RGE trouvés via API
+      const certs=data.certifications_api||[];
+      if(certs.length>0){
+        html+=`<div style="font-size:10px;font-weight:600;color:#16a34a;margin:8px 0 4px">✅ Certifications RGE détectées (${certs.length})</div>`;
+        certs.forEach(c=>{
+          html+=`<div class="rge-cert">
+            <div class="rge-dot dot-ok"></div>
+            <div class="rge-cert-info">
+              <div class="rge-cert-domaine">${c.label||c.libelle||''}</div>
+            </div>
+          </div>`;
+        });
+      } else {
+        html+=`<div class="calert" style="margin:6px 0">⚠ Aucune certification RGE détectée automatiquement — vérifiez via les liens ci-dessous</div>`;
+      }
+    } else {
+      html+=`<div style="font-size:12px;color:#6b7280;margin-bottom:6px">${data.message||'Entreprise non trouvée'}</div>`;
     }
 
-    if(certsValides.length>0){
-      html+=`<div style="font-size:10px;font-weight:600;color:#16a34a;margin:8px 0 4px">✅ Certifications valides (${certsValides.length})</div>`;
-      certsValides.forEach(c=>{
-        html+=`<div class="rge-cert">
-          <div class="rge-dot dot-ok"></div>
-          <div class="rge-cert-info">
-            <div class="rge-cert-domaine">${c.domaine||''}${c.sous_domaine?' — '+c.sous_domaine:''}</div>
-            <div class="rge-cert-detail">${c.organisme||''} ${c.numero_certificat?'· N° '+c.numero_certificat:''}</div>
-            <div class="rge-cert-detail">Valide jusqu'au : ${c.date_fin||'non précisé'}</div>
-          </div>
-        </div>`;
-      });
-    }
-
-    if(certsExpires.length>0){
-      html+=`<div style="font-size:10px;font-weight:600;color:#dc2626;margin:8px 0 4px">❌ Certifications expirées (${certsExpires.length})</div>`;
-      certsExpires.forEach(c=>{
-        html+=`<div class="rge-cert">
-          <div class="rge-dot dot-ko"></div>
-          <div class="rge-cert-info">
-            <div class="rge-cert-domaine">${c.domaine||''}${c.sous_domaine?' — '+c.sous_domaine:''}</div>
-            <div class="rge-cert-expire">⚠ Expiré le ${c.date_fin}</div>
-          </div>
-        </div>`;
-      });
-    }
-
-    html+=`<a class="rge-link" href="https://france-renov.gouv.fr/annuaires-professionnels/artisan-rge-architecte#/tab" target="_blank">🔗 Voir sur l'annuaire France Rénov'</a>
+    // Liens de vérification manuelle — toujours affichés
+    html+=`<div style="font-size:10px;font-weight:600;color:#374151;margin:10px 0 6px;padding-top:8px;border-top:1px solid #f3f4f6">🔗 Vérifier manuellement :</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <a class="rge-link" href="${liens.annuaire_entreprises||`https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siret}`}" target="_blank">📋 Annuaire des Entreprises — Labels & Certificats RGE</a>
+      <a class="rge-link" href="${liens.france_renov||'https://france-renov.gouv.fr/annuaires-professionnels/artisan-rge-architecte#/tab'}" target="_blank">🏠 France Rénov' — Annuaire RGE officiel</a>
+      ${liens.qualibat?`<a class="rge-link" href="${liens.qualibat}" target="_blank">🏗 Qualibat — Annuaire entreprises</a>`:''}
     </div>`;
 
+    // Rappel des domaines à vérifier
+    const domainesAVerifier=[];
+    if(hasIso)domainesAVerifier.push('Isolation thermique (ITI/ITE/combles)');
+    if(hasMenui)domainesAVerifier.push('Menuiseries / Fermetures');
+    if(hasPac)domainesAVerifier.push('Chauffage / Pompe à chaleur');
+    if(hasBois)domainesAVerifier.push('Chauffage bois / Biomasse');
+
+    if(domainesAVerifier.length>0){
+      html+=`<div style="font-size:10px;font-weight:600;color:#374151;margin:10px 0 4px">⚠ Domaines à vérifier pour ce devis :</div>
+      ${domainesAVerifier.map(d=>`<div style="font-size:10px;color:#6b7280;padding:2px 0">• ${d}</div>`).join('')}`;
+    }
+
+    html+=`</div>`;
     rgeEl.innerHTML=html;
 
   }catch(e){
-    rgeEl.innerHTML=`<div class="rge-not-found">Erreur vérification RGE : ${e.message}</div>`;
+    const sirenNum=siret.substring(0,9);
+    const rgeEl2=document.getElementById(`rge-content-${i}`);
+    if(rgeEl2)rgeEl2.innerHTML=`<div class="rge-card">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px">Vérification automatique indisponible</div>
+      <a class="rge-link" href="https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siret}" target="_blank">📋 Vérifier sur l'Annuaire des Entreprises</a><br>
+      <a class="rge-link" href="https://france-renov.gouv.fr/annuaires-professionnels/artisan-rge-architecte#/tab" target="_blank">🏠 France Rénov' — Annuaire RGE</a>
+    </div>`;
   }
 }
 </script>
