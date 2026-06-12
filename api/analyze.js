@@ -105,60 +105,99 @@ Chauffage bois - verifier OBLIGATOIREMENT chaque valeur:
 === TRAVAUX INDUITS - SOURCE GUIDE ANAH JUILLET 2025 ===
 
 ATTENTION REMISES ET REDUCTIONS:
-- Une remise, reduction, escompte ou avoir est une ligne NEGATIVE qui reduit le total. NE PAS la classer comme travail induit exclu.
-- Les remises sont deja incluses dans le montant total HT du devis. Ne pas les deduire une deuxieme fois.
-- Une remise se reconnait par: "remise", "reduction", "escompte", "avoir", "moins-value", montant negatif avec signe moins.
-- Classer une remise dans travaux_induits.remises et non dans exclus.
+- Une remise, reduction, escompte ou avoir est une ligne NEGATIVE. NE PAS la classer comme travail induit exclu.
+- Les remises sont deja incluses dans le montant total HT. Ne pas les deduire une deuxieme fois.
+- Classer une remise dans travaux_induits.remises uniquement.
 
-TRAVAUX INDUITS ELIGIBLES (communs a tous les postes):
-Lis chaque ligne du devis et identifie les postes qui correspondent a ces categories:
-- Depose et pose des equipements, produits et ouvrages necessaires aux travaux
-- Installation et depose d echafaudages, nacelles, lignes de vie
-- Depose mise en decharge des ouvrages, materiaux, equipements anterieurs
-- Depose de revetements de sols et facade en cas d isolation thermique
-- Pose de revetements pour maintenir ou proteger l isolant (plaques de platre, lambris, faux plafond)
-- Raccordement electrique ventilation ou equipement chauffage ou ECS
-- Modifications plomberie, reseaux interieurs, platrerie, peintures
+TRAVAUX INDUITS ELIGIBLES - COMMUNS A TOUS LES POSTES DE TRAVAUX:
+Source: Guide ANAH Juillet 2025, page 13-15.
+- Depose et pose des equipements, produits et ouvrages necessaires a la realisation des travaux (preparation et desinstallation de chantier: echafaudages, nacelles, lignes de vie, affichages preventifs, base de vie ouvriers, nettoyage et deblaiement)
+- Depose mise en decharge et traitement des equipements, produits et ouvrages existants (depose de revetements de sols et facade en cas d isolation thermique)
+- Travaux preparatoires ou travaux de remise en etat consecutifs aux travaux: modifications installation electrique, plomberie, reseaux interieurs, elements de maconnerie, couverture, platrerie, peintures, revetements sol et mur
+- Pose des revetements pour maintenir ou proteger l isolant: plaques de platre, lambris, faux plafond
+- Raccordement electrique de la ventilation ou de l equipement de chauffage ou de production ECS, modification points eclairage/interrupteurs/prises en cas d isolation thermique, remplacement ou installation tableau electrique en cas d installation equipement chauffage ou ECS
+- Modifications plomberie, reseaux interieurs (ex pour ventilation), platrerie et peintures
 - Reprise des appuis, linteaux, tableaux
-- Travaux de remise en etat suite a degradation due aux travaux
-- Deplace des volets suite a isolation thermique
-- Traitement et prevention de l humidite (arases etanches, drainage, vides sanitaires)
-- Traitement etancheite a l air (membrane pare-vapeur, frein-vapeur)
-- Travaux de ventilation pour renouvellement d air minimal
-- Preparation du support (ravalement, decapage, nettoyage, ragréage)
-- Dispositifs de fixation et protection de l isolant (chevillage, collage, rail)
-- Depose et repose structures solidaires (marquise, auvent, balcon, garde-corps, volets-battants)
-- Depose repose evacuation eaux pluviales, gouttieres, zinguerie, ferronnerie
-- Travaux de forage et terrassement pour PAC geothermique ou reseau de chaleur
-- Equipements de regulation temperature (thermostat, programmateur, robinets thermostatiques)
-- Rééquilibrage, desembouage, nettoyage circuit chauffage
-- Adaptation systemes evacuation produits combustion (fumisterie, tubage)
-- Ramonage, debistrage consecutif a installation equipement
+- Eventuels travaux remise en etat suite degradation due aux travaux
+- Deplacement des volets suite a travaux isolation thermique
+- Deplacement, agrandissement et reduction des ouvertures
+- Pose revetement sol en cas installation plancher chauffant
+- Pose revetement mur en cas isolation thermique par interieur
 
-TRAVAUX INDUITS EXCLUS (source guide ANAH juillet 2025 - liste non exhaustive):
-Lis chaque ligne du devis et identifie les postes qui correspondent a ces categories EXCLUES:
+TRAVAUX INDUITS ELIGIBLES - COMMUNS A TOUS LES POSTES D ISOLATION:
+- Traitement et prevention de l humidite: realisation d arases etanches, traitement humidite vides sanitaires, drainage des sols et maconneries
+- Traitement etancheite a l air: pose membrane pare-vapeur, frein-vapeur, amelioration etancheite trappes acces, boites encastrement prises/interrupteurs, gaines techniques, canalisations, coffres volets
+- Travaux de ventilation permettant assurer renouvellement air minimal
+
+TRAVAUX INDUITS ELIGIBLES SPECIFIQUES - ISOLATION MURS ET BARDAGE VENTIЛЕ:
+- Preparation du support: ravalement facade consecutif isolation exterieur (decapage, nettoyage, ragreage, depiquage enduits, doublage facade), reprise appuis fenetres, corniches, acroteres, depose repose ou adaptation modeatures et elements patrimoniaux existants, depose repose evacuation eaux pluviales/gouttieres existantes (sans creation nouvelles gouttieres), deport grilles ventilation, zinguerie, ferronnerie, refection cache-moineaux
+- Dispositifs fixation et protection isolant: chevillage, dilatation, collage, fixation mecanique rail, ossature/profiles support revetements exterieurs, pose revetements proteger isolant (plaques platre, lambris, faux plafond enduit, sous-enduit arme, cornieres, bande-filante incendie, bavettes/profiles/appuis fenetres, finitions chaux/minerale/revetements plastiques)
+- Realisation avancee toit ou couvertine protegeant isolant, ajouts tuiles/ardoises, protection isolation
+- Depose et repose structures solidaires facade (marquise, auvent, balcon, garde-corps, luminaires, volets-battants, store-banne), depose repose evacuation eaux pluviales/gouttieres dont creation nouvelles gouttieres, deport grilles ventilation, zinguerie, ferronnerie
+
+TRAVAUX INDUITS ELIGIBLES SPECIFIQUES - ISOLATION PLANCHERS BAS:
+- Preparation protection ou refection des sols: depose repose revetements sols en cas isolation thermique planchers par interieur, installation lit ragreage (sable, mortier), dalle beton, dalle chaux, protection sous face planchers en cas isolation bas par exterieur
+- Dispositifs fixation et protection isolant: chevillage, dilatation, collage, rail, chapes finition
+
+TRAVAUX INDUITS ELIGIBLES SPECIFIQUES - ISOLATION TOITURE ET SUR-TOITURE VENTIЛЕЕ:
+- Travaux refection couverture existante: depose repose couverture toiture en cas isolation par exterieur, depose repose/adaptation evacuation eaux pluviales/gouttieres, renovation souches/lucarnes/corniches, creation trappe acces combles, pose ecrans sous toiture, pose panneau sandwich bac-acier
+- Dispositifs fixation et protection isolant: chevillage, rail, revetements (plaques platre, lambris, faux plafond, sous-enduit arme, cornieres, bavettes, finitions), ecrans sous toiture
+- Reprise points singuliers toiture et couverture pour etancheite: remplacement tuiles/ardoises, reprise jonction conduits/eaux pluviales/fumees, refection totale etancheite toitures terrasses, ecrans sous toiture
+- Reprise charpente preparatoire points singuliers defaillants toiture: remplacement ponctuels et renforcement charpentes
+
+TRAVAUX INDUITS ELIGIBLES SPECIFIQUES - ISOLATION MENUISERIES EXTERIEURES:
+- Motorisation eventuelle fermetures (volets, persiennes): raccordement electrique volets, peinture et platrerie consecutifs, telecommande volets roulants
+- Fourniture et pose coffre volets: peinture et platrerie consecutifs
+- Isolation coffres volets roulants existants: pose/depose isolant coffre existant, peinture/platrerie consecutifs, reprise etancheite a l air
+
+TRAVAUX INDUITS ELIGIBLES SPECIFIQUES - VENTILATION:
+- Adaptation couverture: chapeaux toiture, depose repose/adaptation evacuation eaux pluviales/gouttieres, deport grilles ventilation, zinguerie, ferronnerie
+- Creation/adaptation systemes evacuation condensats: installation/modification tuyaux evacuation condensats
+- Reprise etancheite a l air: installation entrees/prises air et bouches extraction, pose/depose conduits, amelioration etancheite trappes acces/boites encastrement/gaines/canalisations/coffres volets, membrane pare-vapeur/frein-vapeur, detalonnage portes interieures
+
+TRAVAUX INDUITS ELIGIBLES SPECIFIQUES - INSTALLATION EQUIPEMENT CHAUFFAGE OU ECS:
+- Travaux genie civil: creation chape/socle, carottage, ouvertures murales, sorties toiture-terrasse, obturation conduit
+- Travaux forage et terrassement: echangeur chaleur souterrain PAC geothermique, terrassement raccordement reseaux chaleur
+- Fourniture et pose equipements stockage combustible: cuve, citerne, silo, convoyage granules/plaquettes
+- Depose mise en decharge equipements stockage combustible existants: cuve fioul, citerne gaz, chaudieres, vidange, degazage, nettoyage, comblement reservoir
+- Materiaux calorifugeage et appareils regulation: thermostat ambiance, programmateur, sonde interieure/exterieure, robinets thermostatiques
+- Travaux adaptation emetteurs chaleur eau chaude et distribution: reequilibrage, desembouage, nettoyage circuit chauffage, adaptation remplacement installation emetteurs existants (radiateurs, planchers chauffants), chape beton plancher chauffant, ballon tampon/hydro-accumulation
+- Adaptation installation systemes evacuation produits combustion: fumisterie, tubage, ramonage, debistrage, creation cheminee cas pose insert, demolition cheminee cas pose poele, creation arrivee air, carottage, protection conduit existant (coquille isolante, coffrage), test fumigene
+- Reprise ou renforcement charpente au niveau points singuliers defaillants toiture
+- Travaux ventilation renouvellement air minimal
+
+TRAVAUX INDUITS EXCLUS - SOURCE GUIDE ANAH JUILLET 2025 (liste non exhaustive):
+Les postes suivants ne sont PAS des travaux induits eligibles:
 - Travaux de desamiantage resultant d obligations reglementaires
-- Protection chantier, mise en decharge et traitement dechets amianteé
+- En cas intervention materiaux amianteés: depenses specifiques protection chantier, mise en decharge et traitement dechets amianteés
 - Creation de cloisons interieures
 - Creation d un escalier d acces aux combles
-- Pose de revetements sur ensemble des murs (papiers peints, peinture decorative)
-- Pose de revetement de sol (carrelage, bois, pvc) sauf plancher chauffant ou isolation plancher interieur
+- Pose de revetements sur l ensemble des murs (papiers peints, peinture decorative, etc.)
+- Pose de revetement de sol (carrelage, bois, pvc, etc.) SAUF en cas installation plancher chauffant ou isolation thermique planchers par interieur
 - Creation de nouvelles ouvertures
 - Pose de stores interieurs
-- Nettoyage ou peinture balcons, loggias, terrasses ou volets (sauf degradation pendant travaux)
-- Changement des garde-corps (sauf si necessaire pour isolation)
-- Elements decoratifs (carreaux faience decoratifs, banquettes)
+- Nettoyage ou peinture balcons, loggias, terrasses ou volets (sauf si degradation pendant travaux)
+- Changement garde-corps SAUF si necessaire de les deposer pour realiser l isolation
+- Elements decoratifs: carreaux faience decoratifs parois exterieures ou banquettes
 - Travaux embellissement et habillage insert
-- Production electrique decentralisee (photovoltaique, eolien, pico-hydroelectricite, cogénération)
-- Remplacement ou installation tableau electrique (sauf cadre installation equipement chauffage)
+- Production electrique decentralisee: panneaux photovoltaiques, petit eolien, pico-hydroelectricite, equipements cogeneration
+- Remplacement ou installation tableau electrique SAUF dans cadre installation equipement chauffage
 - Refection totale installation electrique
-- Travaux branchement raccordement electrique au reseau (modification puissance)
-- Creation tranchee pour raccordement gaz ou electricite au reseau de chaleur urbain
-- Frais remise en etat site (remblais) suite depose cuve citerne fioul gaz
+- Travaux branchement/raccordement electrique au reseau (modification puissance)
+- Creation tranchee raccordement gaz ou electricite (raccordement reseau chaleur urbain)
+- Frais remise en etat site (remblais) suite depose cuve/citerne fioul/gaz
 - Extension systeme chauffage dans pieces non chauffees initialement
-- Installation adoucisseurs d eau
-- Appareils individualisation frais de chauffage
-- Installation materiels controle suivi consommations eau electricite (compteurs individuels)
+- Installation adoucisseurs eau
+- Appareils individualisation frais chauffage
+- Installation materiels controle et suivi consommations eau, electricite (compteurs individuels, robinetterie adaptee)
+
+REGLE DE CLASSIFICATION:
+1. Lire chaque ligne du devis
+2. Si la ligne correspond EXACTEMENT a un poste eligible ci-dessus -> classer eligible
+3. Si la ligne correspond EXACTEMENT a un poste exclu ci-dessus -> classer exclu
+4. Si c est une remise/reduction/escompte -> classer dans remises
+5. Si c est le travail principal de renovation energetique -> ne pas classer (ce n est pas un travail induit)
+6. En cas de doute: classer exclu
 
 Retourne ce JSON avec les vraies valeurs du document:
 {"type_document":"${mode}","checks":{"siret":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"date_emission":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"numero_document":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rcs_rne":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"adresse_siege":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"tva_intra":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"montants":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"total_ht":0,"total_ttc":0,"taux_tva":[],"lignes_tva":[{"taux":"","montant_ht":0,"montant_tva":0,"postes":""}],"remises":[{"designation":"","montant_ht":0,"commentaire":""}],"alerte_tva_multiple":false,"commentaire_tva":""}}${isDevis ? ',"date_visite":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rge":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"dechets":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}' : ''},"perf_menuiseries":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"perf_isolation":{"present":false,"conforme":null,"alerte_mpr":"","commentaire":"","details":{"surface_isoler":{"present":false,"valeur":"","commentaire":""},"type_isolant":{"present":false,"valeur":"","commentaire":""},"epaisseur":{"present":false,"valeur":"","commentaire":""},"acermi":{"present":false,"valeur":"","commentaire":""}}},"perf_pac":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"type_pac":"","etas":{"present":false,"valeur":"","conforme":null,"commentaire":""},"scop":{"present":false,"valeur":"","conforme":null,"commentaire":""},"cop":{"present":false,"valeur":"","conforme":null,"commentaire":""},"taux_couverture":{"present":false,"valeur":"","commentaire":""}}},"perf_bois":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"type_equipement":"","flamme_verte":{"present":false,"valeur":"","conforme":null,"commentaire":""},"rendement":{"present":false,"valeur":"","conforme":null,"commentaire":""},"etas":{"present":false,"valeur":"","conforme":null,"commentaire":""}}}},"travaux_induits":{"eligibles":[{"designation":"","montant_ht":0,"commentaire":""}],"exclus":[{"designation":"","montant_ht":0,"raison_exclusion":"","commentaire":""}],"remises":[{"designation":"","montant_ht":0,"commentaire":"remise deja deduite dans le total"}],"total_induits_eligibles_ht":0,"total_exclus_ht":0,"montant_a_deduire_ht":0,"montant_corrige_ht":0,"commentaire_global":""},"score":0,"total":0,"verdict":"incomplet","remarque_globale":""}`
