@@ -376,6 +376,59 @@ function renderResult(i,fname,r){
     <div class="rge-loading" id="rge-content-${i}">⏳ Vérification en cours…</div>
   </div>`;
 
+  // Recap financier
+  const montantsCheck = r.checks?.montants
+  if(montantsCheck?.details){
+    const d = montantsCheck.details
+    html += `<div class="ti-section">`
+    html += `<div class="ti-title" style="color:#1d4ed8">💰 Récapitulatif financier</div>`
+
+    // Total HT et TTC
+    if(d.total_ht || d.total_ttc){
+      html += `<div class="ti-summary ti-summary-ok" style="margin-bottom:8px">
+        <div class="ti-row"><span>Total HT (apres remises)</span><span style="font-weight:700;font-size:14px">${d.total_ht ? d.total_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€' : '-'}</span></div>
+        <div class="ti-row" style="border-top:1px solid #bbf7d0;padding-top:5px;margin-top:4px"><span>Total TTC</span><span style="font-weight:700;font-size:14px">${d.total_ttc ? d.total_ttc.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€' : '-'}</span></div>
+      </div>`
+    }
+
+    // Remises
+    if(d.remises && d.remises.length > 0 && d.remises[0].designation){
+      html += `<div class="ti-title" style="color:#6b7280;margin-top:8px">🏷 Remises et reductions (deja deduites du total)</div>`
+      html += `<table class="ti-table"><tr><th>Designation</th><th>Montant HT</th><th>Note</th></tr>`
+      d.remises.forEach(rem => {
+        html += `<tr><td>${rem.designation||''}</td>
+          <td class="ti-montant" style="color:#6b7280">${rem.montant_ht ? rem.montant_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€' : '-'}</td>
+          <td style="font-size:10px;color:#6b7280">Deja incluse dans le total HT</td>
+        </tr>`
+      })
+      html += `</table>`
+    }
+
+    // TVA breakdown
+    if(d.taux_tva && d.taux_tva.length > 0){
+      const multiTVA = d.alerte_tva_multiple
+      html += `<div class="ti-title" style="color:${multiTVA?'#d97706':'#374151'};margin-top:8px">${multiTVA?'⚠':'📊'} Taux de TVA appliques${multiTVA?' — PLUSIEURS TAUX DETECTES':''}</div>`
+      if(multiTVA && d.commentaire_tva){
+        html += `<div class="calert" style="margin-bottom:6px">⚠ ${d.commentaire_tva}</div>`
+      }
+      if(d.lignes_tva && d.lignes_tva.length > 0 && d.lignes_tva[0].taux){
+        html += `<table class="ti-table"><tr><th>Taux TVA</th><th>Base HT</th><th>Montant TVA</th><th>Postes concernes</th></tr>`
+        d.lignes_tva.forEach(lt => {
+          html += `<tr>
+            <td style="font-weight:600">${lt.taux||''}%</td>
+            <td class="ti-montant">${lt.montant_ht ? lt.montant_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€' : '-'}</td>
+            <td class="ti-montant">${lt.montant_tva ? lt.montant_tva.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€' : '-'}</td>
+            <td style="font-size:10px;color:#6b7280">${lt.postes||''}</td>
+          </tr>`
+        })
+        html += `</table>`
+      } else {
+        html += `<div style="font-size:11px;color:#374151;padding:4px 0">Taux: ${d.taux_tva.join(', ')}%</div>`
+      }
+    }
+    html += `</div>`
+  }
+
   // Travaux induits
   const ti = r.travaux_induits
   if(ti){
@@ -419,6 +472,20 @@ function renderResult(i,fname,r){
         <div class="ti-row" style="border-top:1px solid #fde68a;padding-top:6px;margin-top:4px"><span style="font-weight:600">Montant HT corrige eligble MPR</span><span style="font-weight:700;font-size:13px">${ti.montant_corrige_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})} €</span></div>`:''}
         ${ti.commentaire_global?`<div style="margin-top:6px;font-size:10px;color:#6b7280">${ti.commentaire_global}</div>`:''}
       </div>`
+    }
+
+    // Remises dans travaux induits
+    const hasRemises = ti.remises && ti.remises.length > 0 && ti.remises[0].designation
+    if(hasRemises){
+      html += `<div class="ti-title" style="color:#6b7280;margin-top:10px">🏷 Remises identifiees (deja deduites - non retraitees)</div>`
+      html += `<table class="ti-table"><tr><th>Designation</th><th>Montant HT</th><th>Note</th></tr>`
+      ti.remises.forEach(rem => {
+        html += `<tr><td>${rem.designation||''}</td>
+          <td class="ti-montant" style="color:#6b7280">${rem.montant_ht ? rem.montant_ht.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€' : '-'}</td>
+          <td style="font-size:10px;color:#6b7280">${rem.commentaire||'Remise deja incluse dans le total HT'}</td>
+        </tr>`
+      })
+      html += `</table>`
     }
 
     if(!hasElig && !hasExcl){
