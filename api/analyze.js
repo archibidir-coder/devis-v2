@@ -19,24 +19,62 @@ module.exports = async function handler(req, res) {
 Reponds UNIQUEMENT avec du JSON valide, sans markdown, sans texte avant ou apres.
 TRES IMPORTANT: Dans les valeurs texte, utilise UNIQUEMENT des lettres, chiffres, espaces, points, virgules et tirets. Interdit: apostrophes, guillemets, accents, caracteres speciaux. Max 80 caracteres par valeur texte.
 
-Regles MPR 2026:
-- ITI/ITE non eligibles par geste depuis 01/01/2026 - ajouter alerte_mpr
-- Chaudieres biomasse non eligibles par geste - ajouter alerte_mpr
-- PAC air/air et hybrides exclues - ajouter alerte_mpr
-- conforme=true si valeurs techniques respectent les seuils, conforme=false si inferieures aux seuils, conforme=null si valeurs absentes
-- NE PAS mettre conforme=false uniquement parce que ITI/ITE est exclu du parcours par geste
+INSTRUCTIONS DE LECTURE DU DOCUMENT - TRES IMPORTANT:
+- Lis CHAQUE ligne et CHAQUE paragraphe du document y compris pieds de page, en-tetes, mentions legales, lignes denses, descriptions de produits
+- Les informations peuvent etre sur une seule ligne dense avec tirets ou separateurs ex: "SIRET: 123 - NAF: 4321A - TVA Intracommunautaire: FR76497804377"
+- Pour la TVA intracommunautaire: cherche "FR" suivi de 11 caracteres dans TOUT le document, peut etre ecrit "TVA Intracommunautaire", "TVA intracom", "N TVA", "TVA FR"
+- Pour le SIRET: 14 chiffres consecutifs, peut etre avec espaces ex "497 804 377 00024"
+- Pour le RCS/RNE: cherche "RCS", "RNE", "Registre du commerce" suivi d une ville et d un numero
+- Pour l assurance decennale: cherche numero de police, nom assureur, meme dans les mentions legales en bas de page
+- Ne pas sauter une information parce qu elle est sur la meme ligne que d autres informations
 
-Menuiseries - conforme=true si valeurs respectees:
-- Fenetres et portes-fenetres: (Uw<=1.3 ET Sw>=0.3) OU (Uw<=1.7 ET Sw>=0.36)
-- Velux fenetres de toiture: Uw<=1.5 ET Sw>=0.36
-- Doubles fenetres sur baie existante: Uw<=1.8 ET Sw>=0.36
-- Porte entree ou exterieur: Ud<=1.7. conforme=true si Ud<=1.7
-- Volets roulants: R>0.22. conforme=true si R>0.22
-- Si Uw ou Sw absent: conforme=null
+INSTRUCTIONS SPECIFIQUES POUR LES VALEURS TECHNIQUES D ISOLATION:
+- La valeur R peut etre ecrite de multiples facons: "R=3.75", "R = 3,75", "R: 3.75", "resistance thermique 3.75", "Rth=3.75", "(R=3.75 m2.K/W)", "R 3.75 m2K/W"
+- Cherche la valeur R dans les descriptions de produits, pas seulement dans des champs dedies
+- Le numero ACERMI peut etre ecrit: "ACERMI N 02/016/156", "ACERMI N°02/016/156", "Certification Acermi 02/016/156", "cert. ACERMI: 02/016/156" - le symbole degre ou numero est variable
+- L epaisseur peut etre ecrite: "120 mm", "120mm", "epaisseur 120", "ep. 120", "en 120 mm d epaisseur"
+- La marque et reference du produit sont souvent dans la description: "marque KNAUF reference TP238", "KNAUF TP238", "isolant KNAUF"
+- Le type d isolant peut etre: "doublage placostil", "laine de verre", "laine de roche", "PSE", "polyurethane", "ouate de cellulose"
+- Meme si les infos sont dans un long paragraphe de description, extraire chaque valeur separement
+- Exemple de description a parser: "Doublage placostil avec isolation de marque KNAUF reference TP238 en 120 mm d epaisseur (R=3.75 m2.K/W) ACERMI N 02/016/156" -> type=doublage placostil KNAUF TP238, epaisseur=120mm, R=3.75, ACERMI=02/016/156
 
-Isolation - conforme=true si R respecte le seuil:
-- Combles perdus R>=7. Rampants R>=6. Terrasse R>=6.5. Plancher bas R>=3
-- Murs ITI R>=3.7 (alerte non eligible MPR par geste). Murs ITE R>=4.4 (alerte non eligible MPR par geste)
+REGLES DE COMPARAISON - ABSOLUMENT CRITIQUE:
+conforme=true si la valeur du devis est SUPERIEURE OU EGALE au seuil minimum.
+conforme=false UNIQUEMENT si la valeur est STRICTEMENT INFERIEURE au seuil.
+conforme=null si la valeur est ABSENTE du devis.
+EXEMPLES CORRECTS:
+- Seuil R>=4.4 et devis R=4.5 -> conforme=true (4.5 >= 4.4 OK)
+- Seuil R>=3.7 et devis R=3.75 -> conforme=true (3.75 >= 3.7 OK)
+- Seuil R>=7 et devis R=7.5 -> conforme=true (7.5 >= 7 OK)
+- Seuil Uw<=1.3 et devis Uw=1.2 -> conforme=true (1.2 <= 1.3 OK)
+- Seuil Ud<=1.7 et devis Ud=1.0 -> conforme=true (1.0 <= 1.7 OK)
+- Seuil ETAS>=126 et devis ETAS=130 -> conforme=true (130 >= 126 OK)
+- Seuil COP>=3 et devis COP=3.5 -> conforme=true (3.5 >= 3 OK)
+- Seuil rendement>=87 et devis rendement=90 -> conforme=true (90 >= 87 OK)
+- Seuil R>=4.4 et devis R=4.2 -> conforme=false (4.2 < 4.4 NON)
+NE JAMAIS mettre conforme=false si la valeur respecte ou depasse le seuil.
+NE JAMAIS mettre conforme=false uniquement parce que ITI/ITE est exclu MPR par geste.
+
+Regles MPR 2026 eligibilite:
+- ITI/ITE non eligibles par geste depuis 01/01/2026 -> ajouter alerte_mpr MAIS conforme selon valeur R
+- Chaudieres biomasse non eligibles par geste -> ajouter alerte_mpr MAIS conforme selon rendement/ETAS
+- PAC air/air et hybrides exclues -> ajouter alerte_mpr
+
+Menuiseries - seuils techniques:
+- Fenetres et portes-fenetres: conforme=true si (Uw<=1.3 ET Sw>=0.3) OU (Uw<=1.7 ET Sw>=0.36). Ex: Uw=1.3 Sw=0.32 -> conforme=true
+- Velux fenetres de toiture: conforme=true si Uw<=1.5 ET Sw>=0.36. Ex: Uw=1.4 -> conforme=true
+- Doubles fenetres sur baie existante: conforme=true si Uw<=1.8 ET Sw>=0.36
+- Porte entree ou exterieur: conforme=true si Ud<=1.7. Ex: Ud=1.0 -> conforme=true. Ex: Ud=1.7 -> conforme=true
+- Volets roulants: conforme=true si R>=0.22. Ex: R=0.25 -> conforme=true
+- Si Uw, Sw, Ud ou R absent du devis: conforme=null + commentaire valeur manquante
+
+Isolation - seuils techniques (conforme=true si R >= seuil):
+- Combles perdus: seuil R>=7. Ex: R=7.5 -> conforme=true
+- Rampants de toiture: seuil R>=6. Ex: R=6.5 -> conforme=true
+- Toiture terrasse: seuil R>=6.5. Ex: R=7 -> conforme=true
+- Plancher bas: seuil R>=3. Ex: R=3.5 -> conforme=true
+- Murs ITI: seuil R>=3.7. Ex: R=3.75 -> conforme=true. Ex: R=4.0 -> conforme=true. Ajouter alerte_mpr non eligible par geste.
+- Murs ITE: seuil R>=4.4. Ex: R=4.5 -> conforme=true. Ex: R=5.0 -> conforme=true. Ajouter alerte_mpr non eligible par geste.
 
 PAC et CET - verifier OBLIGATOIREMENT chaque valeur ligne par ligne:
 - PAC air/eau basse temperature (35C): ETAS>=126 ET SCOP>=3.9. Si ETAS absent: conforme=null + commentaire ETAS manquant obligatoire MPR. Si SCOP absent: signaler SCOP manquant.
