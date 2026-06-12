@@ -191,13 +191,127 @@ Les postes suivants ne sont PAS des travaux induits eligibles:
 - Appareils individualisation frais chauffage
 - Installation materiels controle et suivi consommations eau, electricite (compteurs individuels, robinetterie adaptee)
 
-REGLE DE CLASSIFICATION:
+REGLE DE CLASSIFICATION - STRICTE ET SANS INTERPRETATION:
 1. Lire chaque ligne du devis
-2. Si la ligne correspond EXACTEMENT a un poste eligible ci-dessus -> classer eligible
-3. Si la ligne correspond EXACTEMENT a un poste exclu ci-dessus -> classer exclu
+2. Si la ligne correspond EXACTEMENT a un poste exclu -> classer EXCLU. Les exclusions ont priorite absolue.
+3. Si la ligne correspond EXACTEMENT a un poste eligible -> classer eligible
 4. Si c est une remise/reduction/escompte -> classer dans remises
-5. Si c est le travail principal de renovation energetique -> ne pas classer (ce n est pas un travail induit)
-6. En cas de doute: classer exclu
+5. Si c est le travail principal de renovation energetique -> ne pas classer (travail principal, pas induit)
+6. En cas de doute: classer EXCLU
+
+REGLES STRICTES DE CLASSIFICATION PAR POSTE - GUIDE ANAH JUILLET 2025:
+
+=== ISOLATION THERMIQUE ===
+ELIGIBLE:
+- Echafaudage, nacelles, lignes de vie pour travaux isolation
+- Depose repose revetements sols/facades pour isolation
+- Ravalement de facade consecutif a isolation exterieure (decapage, nettoyage, ragreage, enduit)
+- Reprise appuis fenetres, corniches, acroteres apres ITE
+- Depose repose gouttieres et evacuations eaux pluviales existantes (sans creation nouvelles gouttieres)
+- Deport grilles ventilation, zinguerie, ferronnerie
+- Dispositifs de fixation isolant: chevillage, collage, rail, ossature
+- Faux plafond ou plaque platre pose UNIQUEMENT pour maintenir ou proteger un isolant thermique deja installe au plafond ou au mur
+- Pose revetement mur en cas d isolation thermique par interieur (ITI uniquement)
+- Pose revetement sol en cas d isolation plancher par interieur ou plancher chauffant
+- Traitement humidite: arases etanches, drainage, vides sanitaires
+- Membrane pare-vapeur, frein-vapeur
+- Depose repose structures solidaires facade: marquise, auvent, balcon, garde-corps, luminaires, volets-battants (pour permettre l isolation)
+- Couvertine, avancee de toit pour proteger isolant
+- Trappe acces combles (creation uniquement si necessaire pour isolation)
+- Ecrans sous toiture
+- Depose repose couverture pour isolation toiture par exterieur
+- Renovation souches, lucarnes, corniches liees a isolation toiture
+- Renforcement charpente points singuliers defaillants
+
+EXCLU:
+- Creation de cloisons interieures (toute cloison: 72/48, 70/98, 48, phonique, hydro, contre-baignoire) = EXCLU ABSOLU
+- Habillage WC suspendu, habillage baignoire, coffrage, caisson = EXCLU
+- BA13 hydro ou marine en amenagement pieces humides (SDB, WC) = EXCLU
+- Plus-value BA13 hydro/marine en remplacement BA13 standard = EXCLU
+- Pose revetements decoratifs ensemble des murs (papiers peints, peinture decorative) = EXCLU
+- Pose revetement sol (carrelage, bois, pvc) sauf plancher chauffant ou isolation plancher interieur = EXCLU
+- Creation nouvelles ouvertures = EXCLU
+- Creation escalier acces combles = EXCLU
+- Pose stores interieurs = EXCLU
+- Nettoyage ou peinture balcons, loggias, terrasses, volets (sauf degradation pendant travaux) = EXCLU
+- Changement garde-corps (sauf si necessaire pour deposer pour realiser isolation) = EXCLU
+- Elements decoratifs: faience decorative, banquettes = EXCLU
+- Refection totale installation electrique = EXCLU
+- Travaux branchement/raccordement electrique reseau (modification puissance) = EXCLU
+
+=== MENUISERIES EXTERIEURES ===
+ELIGIBLE:
+- Motorisation volets/persiennes: raccordement electrique, telecommande
+- Peinture et platrerie consecutifs a pose volets/persiennes
+- Fourniture et pose coffre des volets
+- Pose/depose isolant thermique coffre volets roulants existants
+- Reprise etancheite a l air apres pose menuiseries
+- Travaux peinture et platrerie consecutifs a l intervention menuiseries
+
+EXCLU:
+- Poses de stores interieurs = EXCLU
+- Elements decoratifs = EXCLU
+- Nettoyage ou peinture volets sauf si degradation pendant travaux = EXCLU
+
+=== VENTILATION ===
+ELIGIBLE:
+- Mise en place chapeaux de toiture
+- Depose repose/adaptation evacuation eaux pluviales/gouttieres existantes (sans creation nouvelles)
+- Deport grilles ventilation, zinguerie, ferronnerie
+- Installation/modification tuyaux evacuation condensats
+- Installation entrees/prises d air et bouches extraction
+- Pose/depose conduits
+- Amelioration etancheite ou remplacement trappes acces, boites encastrement prises/interrupteurs, gaines techniques, canalisations, coffres volets
+- Membrane pare-vapeur, frein-vapeur
+- Detalonnage portes interieures
+
+EXCLU:
+- Refection totale installation electrique = EXCLU
+- Travaux branchement reseau = EXCLU
+- Creation nouvelles ouvertures = EXCLU
+
+=== CHAUFFAGE ET ECS (PAC, CHAUDIERE, POELE, INSERT, CET) ===
+ELIGIBLE:
+- Creation chape/socle accueil unite production chaleur
+- Carottage, ouvertures murales, sorties toiture-terrasse, obturation conduit
+- Travaux forage et terrassement PAC geothermique ou raccordement reseau chaleur
+- Fourniture et pose stockage combustible: cuve, citerne, silo, convoyage granules/plaquettes
+- Depose mise en decharge equipements existants: cuve fioul, citerne gaz, chaudieres (vidange, degazage, nettoyage, comblement)
+- Thermostat ambiance, programmateur, sonde interieure/exterieure, robinets thermostatiques
+- Reequilibrage, desembouage, nettoyage circuit chauffage ou ECS
+- Remplacement installation emetteurs chaleur: radiateurs, planchers chauffants
+- Chape beton coulee sur plancher chauffant
+- Ballon tampon, hydro-accumulation
+- Fumisterie, tubage, ramonage, debistrage
+- Creation cheminee en cas pose insert (hors embellissement/decoration)
+- Demolition cheminee en cas pose poele
+- Creation arrivee air, protection conduit existant (coquille isolante, coffrage)
+- Test fumigene
+- Adaptation toiture consecutive a creation/modification conduit cheminee
+- Renforcement charpente points singuliers
+- Travaux ventilation renouvellement air minimal
+- Remplacement tableau electrique UNIQUEMENT dans le cadre installation equipement chauffage ou ECS
+- Raccordement electrique equipement chauffage ou ECS
+
+EXCLU:
+- Extension systeme chauffage dans pieces non chauffees initialement = EXCLU
+- Installation adoucisseurs eau = EXCLU
+- Appareils individualisation frais chauffage = EXCLU
+- Installation materiels controle/suivi consommations eau/electricite (compteurs individuels) = EXCLU
+- Travaux embellissement et habillage insert = EXCLU
+- Remplacement ou installation tableau electrique SAUF si lie a installation equipement chauffage = EXCLU
+- Refection totale installation electrique = EXCLU
+- Travaux branchement/raccordement electrique reseau = EXCLU
+- Creation tranchee raccordement gaz ou electricite = EXCLU
+- Frais remise en etat site (remblais) suite depose cuve/citerne = EXCLU
+- Production electrique decentralisee (photovoltaique, eolien, pico-hydroelectricite, cogénération) = EXCLU
+
+=== REGLE FINALE ABSOLUE ===
+- Les exclusions ont PRIORITE ABSOLUE sur les eligibilites.
+- Si un poste est dans la liste des exclus, il est EXCLU meme si son libelle contient "consecutif", "platrerie", "isolation", "lie aux travaux".
+- Une cloison est TOUJOURS exclue, peu importe sa composition (laine phonique, laine thermique, BA13 hydro).
+- Un habillage, coffrage, caisson est TOUJOURS exclu.
+- En cas de doute: classer EXCLU.
 
 Retourne ce JSON avec les vraies valeurs du document:
 {"type_document":"${mode}","checks":{"siret":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"date_emission":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"numero_document":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rcs_rne":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"adresse_siege":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"tva_intra":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"montants":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"total_ht":0,"total_ttc":0,"taux_tva":[],"lignes_tva":[{"taux":"","montant_ht":0,"montant_tva":0,"postes":""}],"remises":[{"designation":"","montant_ht":0,"commentaire":""}],"alerte_tva_multiple":false,"commentaire_tva":""}}${isDevis ? ',"date_visite":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"rge":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"dechets":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""}' : ''},"perf_menuiseries":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":""},"perf_isolation":{"present":false,"conforme":null,"alerte_mpr":"","commentaire":"","details":{"surface_isoler":{"present":false,"valeur":"","commentaire":""},"type_isolant":{"present":false,"valeur":"","commentaire":""},"epaisseur":{"present":false,"valeur":"","commentaire":""},"acermi":{"present":false,"valeur":"","commentaire":""}}},"perf_pac":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"type_pac":"","etas":{"present":false,"valeur":"","conforme":null,"commentaire":""},"scop":{"present":false,"valeur":"","conforme":null,"commentaire":""},"cop":{"present":false,"valeur":"","conforme":null,"commentaire":""},"taux_couverture":{"present":false,"valeur":"","commentaire":""}}},"perf_bois":{"present":false,"valeur":"","conforme":null,"alerte_mpr":"","commentaire":"","details":{"type_equipement":"","flamme_verte":{"present":false,"valeur":"","conforme":null,"commentaire":""},"rendement":{"present":false,"valeur":"","conforme":null,"commentaire":""},"etas":{"present":false,"valeur":"","conforme":null,"commentaire":""}}}},"travaux_induits":{"eligibles":[{"designation":"","montant_ht":0,"commentaire":""}],"exclus":[{"designation":"","montant_ht":0,"raison_exclusion":"","commentaire":""}],"remises":[{"designation":"","montant_ht":0,"commentaire":"remise deja deduite dans le total"}],"total_induits_eligibles_ht":0,"total_exclus_ht":0,"montant_a_deduire_ht":0,"montant_corrige_ht":0,"commentaire_global":""},"score":0,"total":0,"verdict":"incomplet","remarque_globale":""}`
