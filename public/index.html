@@ -311,63 +311,74 @@ function renderResult(i,fname,r){
   <div class="section-title">Éléments administratifs</div>
   <div class="checks">`;
   ADMIN.filter(k=>r.checks?.[k]).forEach(k=>{html+=checkHTML(LABELS[k]||k,r.checks[k])});
-  html+=`</div><div class="section-title">Critères de performance</div><div class="checks">`;
-  PERF.filter(k=>r.checks?.[k]).forEach(k=>{
-    const c=r.checks[k];
-    html+=checkHTML(LABELS[k]||k,c);
+  html+=`</div>`;
 
-    // Sous-details isolation
-    if(k==='perf_isolation'&&c.present&&c.details){
-      Object.entries(c.details).forEach(([sk,sv])=>{html+=checkHTML(ISO_LABELS[sk]||sk,sv,true)});
-    }
+  // === ISOLATION ===
+  const iso = r.checks?.postes_isolation;
+  if(iso?.present && iso.postes?.length){
+    html+=`<div class="section-title">Isolation thermique</div><div class="checks">`;
+    const ISO_TYPES = {toiture_terrasse:'Toiture terrasse',rampants_combles:'Rampants de toiture / Plafonds combles',combles_perdus:'Plancher combles perdus',murs_iti:'Murs - Isolation par Interieur (ITI)',murs_ite:'Murs - Isolation par Exterieur (ITE)',plancher_bas:'Plancher bas (sous-sol, vide sanitaire, terre-plein)'};
+    iso.postes.forEach(p=>{
+      if(!p.type_poste)return;
+      const lbl = ISO_TYPES[p.type_poste]||p.type_poste;
+      html+=checkHTML(`${lbl}${p.r_seuil?' — seuil '+p.r_seuil:''}`,{present:true,valeur:p.r_valeur?`R=${p.r_valeur} m2.K/W — ${p.surface_m2||''} m2 — ${p.type_isolant||''} ${p.epaisseur_mm||''}mm — ACERMI: ${p.acermi||'non mentionne'}`:'',conforme:p.r_conforme,alerte_mpr:p.alerte_mpr||'',commentaire:p.commentaire||''});
+    });
+    html+=`</div>`;
+  } else if(iso?.present===false){
+    html+=`<div class="section-title">Isolation thermique</div><div class="checks"><div class="check"><div class="ci ok" style="font-size:10px">—</div><div class="cinfo"><div class="cname sm">Aucun poste isolation detecte</div></div></div></div>`;
+  }
 
-    // Sous-details PAC
-    if(k==='perf_pac'&&c.present&&c.details){
-      const d=c.details;
-      if(d.type_pac)html+=`<div class="check sub"><div class="ci ok">i</div><div class="cinfo"><div class="cname sm">Type PAC</div><div class="cfound">${d.type_pac}</div></div></div>`;
-      const pacFields=[
-        {key:'etas',label:'ETAS (efficacite energetique saisonniere)'},
-        {key:'scop',label:'SCOP (coefficient performance saisonnier)'},
-        {key:'cop',label:'COP (coefficient performance)'},
-        {key:'taux_couverture',label:'Taux de couverture PAC'}
-      ];
-      pacFields.forEach(f=>{
-        if(d[f.key]){
-          const sv=d[f.key];
-          html+=checkHTML(f.label,{
-            present:sv.present,
-            valeur:sv.valeur||'',
-            conforme:sv.conforme!==undefined?sv.conforme:null,
-            alerte_mpr:'',
-            commentaire:sv.commentaire||(!sv.present?'ABSENT - obligatoire pour eligibilite MPR':'')
-          },true);
-        }
-      });
-    }
+  // === MENUISERIES ===
+  const men = r.checks?.postes_menuiseries;
+  if(men?.present && men.produits?.length){
+    html+=`<div class="section-title">Menuiseries exterieures</div><div class="checks">`;
+    const MEN_TYPES = {fenetre_pf:'Fenetre ou Porte-Fenetre',fenetre_toiture:'Fenetre de Toiture (Velux)',double_fenetre:'Double Fenetre sur baie existante',porte_entree:"Porte d Entree",volet_isolant:'Volet Isolant / Volet-lame air ventile'};
+    const MEN_SEUILS = {fenetre_pf:'Uw<=1.3+Sw>=0.3 OU Uw<=1.7+Sw>=0.36',fenetre_toiture:'Uw<=1.5 ET Sw<=0.36',double_fenetre:'Uw<=1.8 ET Sw>=0.32',porte_entree:'Ud<=1.7 W/m2.K',volet_isolant:'R>0.22 m2.K/W'};
+    men.produits.forEach(p=>{
+      if(!p.type_poste)return;
+      const lbl = MEN_TYPES[p.type_poste]||p.type_poste;
+      const seuil = MEN_SEUILS[p.type_poste]||'';
+      let valStr = '';
+      if(p.uw)valStr+=`Uw=${p.uw} `;
+      if(p.sw)valStr+=`Sw=${p.sw} `;
+      if(p.ud)valStr+=`Ud=${p.ud} `;
+      if(p.r_volet)valStr+=`R=${p.r_volet} `;
+      html+=checkHTML(`${lbl}${seuil?' — seuil: '+seuil:''}`,{present:true,valeur:(valStr+' '+p.libelle_devis).trim(),conforme:p.conforme,alerte_mpr:p.alerte_mpr||'',commentaire:p.commentaire||''});
+    });
+    html+=`</div>`;
+  }
 
-    // Sous-details chauffage bois
-    if(k==='perf_bois'&&c.present&&c.details){
-      const d=c.details;
-      if(d.type_equipement)html+=`<div class="check sub"><div class="ci ok">i</div><div class="cinfo"><div class="cname sm">Type equipement</div><div class="cfound">${d.type_equipement}</div></div></div>`;
-      const boisFields=[
-        {key:'flamme_verte',label:'Label Flamme Verte 7 etoiles'},
-        {key:'rendement',label:'Rendement (>= 87%)'},
-        {key:'etas',label:'ETAS (>= 111% poeles / >= 126% chaudieres)'}
-      ];
-      boisFields.forEach(f=>{
-        if(d[f.key]){
-          const sv=d[f.key];
-          html+=checkHTML(f.label,{
-            present:sv.present,
-            valeur:sv.valeur||'',
-            conforme:sv.conforme!==undefined?sv.conforme:null,
-            alerte_mpr:'',
-            commentaire:sv.commentaire||(!sv.present?'ABSENT - obligatoire pour eligibilite MPR':'')
-          },true);
-        }
-      });
-    }
-  });
+  // === CHAUFFAGE ===
+  const chauf = r.checks?.postes_chauffage;
+  if(chauf?.present && chauf.equipements?.length){
+    html+=`<div class="section-title">Equipements de chauffage et ECS</div><div class="checks">`;
+    const CHAUF_TYPES = {pac_air_eau_bt:'PAC Air/Eau Basse Temperature (35C)',pac_air_eau_mt:'PAC Air/Eau Moyenne et Haute Temperature (55C)',pac_geothermique:'PAC Geothermique (eau/eau, sol/eau)',pac_air_air:'PAC Air/Air',cet:'Chauffe-Eau Thermodynamique (CET)',poele_buches:"Poele a Buches",insert_buches:"Insert a Buches",poele_granules:"Poele a Granules/Plaquettes",insert_granules:"Insert a Granules/Plaquettes",chaudiere_biomasse:'Chaudiere Bois/Biomasse'};
+    chauf.equipements.forEach(eq=>{
+      if(!eq.type_poste)return;
+      const lbl = CHAUF_TYPES[eq.type_poste]||eq.type_poste;
+      let valStr = '';
+      if(eq.marque_reference)valStr+=eq.marque_reference+' ';
+      if(eq.puissance_kw)valStr+=eq.puissance_kw+'kW ';
+      if(eq.etas_valeur)valStr+=`ETAS=${eq.etas_valeur}%(seuil ${eq.etas_seuil||'?'}%) `;
+      if(eq.flamme_verte?.present)valStr+=`Flamme Verte: ${eq.flamme_verte.valeur||'presente'} `;
+      if(eq.profil_soutirage)valStr+=`Profil: ${eq.profil_soutirage} `;
+      html+=checkHTML(lbl,{present:true,valeur:valStr.trim(),conforme:eq.etas_conforme,alerte_mpr:eq.alerte_mpr||'',commentaire:eq.commentaire||''});
+      // Sous-details emissions
+      if(eq.emissions?.co||eq.emissions?.particules){
+        const em=eq.emissions;
+        html+=checkHTML('Emissions (CO, COV, particules, NOx)',{present:true,valeur:`CO:${em.co||'?'} COV:${em.cov||'?'} Particules:${em.particules||'?'} NOx:${em.nox||'?'}`,conforme:em.conforme,alerte_mpr:'',commentaire:''},true);
+      }
+    });
+    html+=`</div>`;
+  }
+
+  // === VMC ===
+  const vmc = r.checks?.poste_vmc;
+  if(vmc?.present){
+    html+=`<div class="section-title">VMC Double Flux</div><div class="checks">`;
+    html+=checkHTML(`VMC Double Flux ${vmc.type_installation||''}`,{present:true,valeur:`Caisson classe ${vmc.classe_energetique_caisson||'?'} — Echangeur ${vmc.efficacite_echangeur||'?'} — ${vmc.certification||''}`,conforme:vmc.conforme,alerte_mpr:vmc.alerte_mpr||'',commentaire:vmc.commentaire||''});
+    html+=`</div>`;
+  }
   html+=`</div>`;
 
   // Zone RGE
