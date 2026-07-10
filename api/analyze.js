@@ -329,12 +329,42 @@ Retourne ce JSON avec les vraies valeurs du document:
     if (data.error) return res.status(500).json({ error: data.error.message })
 
     let raw = '{' + data.content.map(b => b.text || '').join('')
-    raw = raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
-    const end = raw.lastIndexOf('}')
-    if (end === -1) return res.status(500).json({ error: 'Reponse invalide. Reessayez.' })
-    raw = raw.substring(0, end + 1)
 
-    return res.status(200).json(JSON.parse(raw))
+    // Nettoyage robuste
+    raw = raw.replace(/[ -
+--]/g, ' ')
+    raw = raw.replace(/	/g, ' ')
+    raw = raw.replace(/
+/g, '')
+    raw = raw.replace(/
+/g, ' ')
+
+    // Extraire le JSON entre le premier { et le dernier }
+    const start = raw.indexOf('{')
+    const end = raw.lastIndexOf('}')
+    if (start === -1 || end === -1) return res.status(500).json({ error: 'Reponse invalide. Reessayez.' })
+    raw = raw.substring(start, end + 1)
+
+    // Tentative de parse avec reparation si echec
+    try {
+      return res.status(200).json(JSON.parse(raw))
+    } catch(parseErr) {
+      // Reparer apostrophes non echappees dans les valeurs
+      const fixed = raw
+        .replace(/([^\])'([^,}\]:])/g, "$1\'$2")
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*]/g, ']')
+      try {
+        return res.status(200).json(JSON.parse(fixed))
+      } catch(e2) {
+        // Retourner debug info
+        const pos = parseInt(parseErr.message.match(/position (\d+)/)?.[1] || '0')
+        return res.status(500).json({
+          error: parseErr.message,
+          debug: raw.substring(Math.max(0, pos-80), pos+80)
+        })
+      }
+    }
 
   } catch (e) {
     return res.status(500).json({ error: e.message })
