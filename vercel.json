@@ -2,10 +2,19 @@
   "version": 2,
   "builds": [
     { "src": "public/**", "use": "@vercel/static" },
-    { "src": "api/analyze.js", "use": "@vercel/node" }
+    { "src": "api/analyze.js", "use": "@vercel/node" },
+    { "src": "api/rge.js", "use": "@vercel/node" },
+    { "src": "api/test.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/analyze", "dest": "/api/analyze.js" },
+    { "src": "/api/rge", "dest": "/api/rge.js" },
+    { "src": "/api/test", "dest": "/api/test.js" },
     { "src": "/(.*)", "dest": "/public/$1" }
-  ]
+  ],
+  "functions": {
+    "api/analyze.js": {
+      "maxDuration": 60
+    }
+  }
 }
