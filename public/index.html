@@ -123,7 +123,7 @@
   <div id="drop-zone" class="upload-area" onclick="document.getElementById('file-input').click()">
     <div class="icon">📂</div>
     <div class="main">Cliquez ou déposez vos PDF ici</div>
-    <div class="sub">Plusieurs PDF acceptés — max 10 Mo chacun</div>
+    <div class="sub">PDF uniquement — max 3 Mo chacun (compresser sur ilovepdf.com si besoin)</div>
   </div>
   <input type="file" id="file-input" accept="application/pdf" multiple style="display:none" onchange="onFiles(event)"/>
 
@@ -166,7 +166,7 @@ function onFiles(e){
 
 function addFile(f){
   if(f.type!=='application/pdf'){alert('PDF uniquement: '+f.name);return}
-  if(f.size>10*1024*1024){alert('Max 10Mo: '+f.name);return}
+  if(f.size>3*1024*1024){alert('PDF trop volumineux: '+f.name+' ('+Math.round(f.size/1024/1024*10)/10+' Mo). Max 3 Mo. Compressez sur ilovepdf.com');return}
   if(files.find(x=>x.name===f.name&&x.size===f.size))return;
   files.push(f);
   renderFileList();
@@ -205,7 +205,16 @@ dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');Ar
 function fileToBase64(f){
   return new Promise((res,rej)=>{
     const r=new FileReader();
-    r.onload=e=>res(e.target.result.split(',')[1]);
+    r.onload=e=>{
+      const b64=e.target.result.split(',')[1];
+      // Vercel limite: 4.5Mo. Base64 = ~1.33x taille PDF
+      // Donc PDF max ~3.3Mo pour rester sous la limite
+      if(b64.length > 4400000){
+        rej(new Error('PDF trop volumineux pour Vercel (max ~3 Mo). Compressez votre PDF avant de le deposer. Vous pouvez utiliser https://www.ilovepdf.com/compress_pdf'));
+        return;
+      }
+      res(b64);
+    };
     r.onerror=()=>rej(new Error('Lecture impossible'));
     r.readAsDataURL(f);
   });
