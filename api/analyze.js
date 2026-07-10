@@ -325,8 +325,16 @@ Retourne ce JSON avec les vraies valeurs du document:
       })
     })
 
+    // Verifier que la reponse est bien du JSON
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.includes('application/json')) {
+      const text = await response.text()
+      return res.status(500).json({ error: 'Erreur serveur Anthropic: ' + text.substring(0, 200) })
+    }
+
     const data = await response.json()
-    if (data.error) return res.status(500).json({ error: data.error.message })
+    if (data.error) return res.status(500).json({ error: 'Anthropic: ' + (data.error.message || JSON.stringify(data.error)) })
+    if (!data.content || !data.content.length) return res.status(500).json({ error: 'Reponse vide du modele. Reessayez.' })
 
     let raw = '{' + data.content.map(b => b.text || '').join('')
 
